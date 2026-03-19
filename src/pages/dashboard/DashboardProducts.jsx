@@ -1,24 +1,31 @@
 import { useState, useEffect, useRef } from 'react'
 import { Plus, Search, Edit2, Trash2, X, Upload, ImageIcon } from 'lucide-react'
+import { apiUrl } from '../../lib/api'
 
-const BRANDS = ['Nike', 'Adidas', 'Jordan', 'Converse', 'New Balance', 'Puma', 'Reebok']
-const CATEGORIES = ['Running', 'Lifestyle', 'Basketball', 'Skateboarding']
+const BRANDS = ['Nike', 'Adidas', 'Jordan', 'Converse', 'New Balance', 'Puma', 'Reebok', 'NO LOGO']
+const SHOE_CATEGORIES = ['Running', 'Lifestyle', 'Basketball', 'Skateboarding']
+const APPAREL_CATEGORIES = ['Tops', 'Hoodies', 'Bottoms', 'Outerwear']
 const BADGES = ['', 'New', 'Hot', 'Sale', 'Limited', 'Classic', 'Exclusive']
-const ALL_SIZES = [5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 13]
+const SHOE_SIZES = [5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 13]
+const APPAREL_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
 
 const emptyForm = {
+  productType: 'shoes',
   name: '', brand: 'Nike', price: '', originalPrice: '',
+  description: '',
   image: '', category: 'Running', badge: '', sizes: [], inStock: true,
 }
 
 function ProductModal({ product, onClose, onSave }) {
-  const [form, setForm] = useState(product ?? emptyForm)
+  const [form, setForm] = useState(product ? { ...emptyForm, ...product } : emptyForm)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const fileRef = useRef(null)
 
   const set = (field) => (e) => setForm(f => ({ ...f, [field]: e.target.value }))
+  const categories = form.productType === 'apparel' ? APPAREL_CATEGORIES : SHOE_CATEGORIES
+  const sizeOptions = form.productType === 'apparel' ? APPAREL_SIZES : SHOE_SIZES
 
   const handleImageFile = async (e) => {
     const file = e.target.files?.[0]
@@ -28,7 +35,7 @@ function ProductModal({ product, onClose, onSave }) {
     try {
       const data = new FormData()
       data.append('image', file)
-      const res = await fetch('/api/upload', { method: 'POST', body: data })
+      const res = await fetch(apiUrl('/api/upload'), { method: 'POST', body: data })
       const json = await res.json()
       if (!res.ok) { setError(json.error || 'Upload failed'); return }
       setForm(f => ({ ...f, image: json.url }))
@@ -49,8 +56,8 @@ function ProductModal({ product, onClose, onSave }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
-    if (!form.name.trim() || !form.image.trim() || !form.price) {
-      setError('Name, image, and price are required')
+    if (!form.name.trim() || !form.image.trim() || !form.price || !form.description.trim()) {
+      setError('Name, description, image, and price are required')
       return
     }
     setSaving(true)
@@ -61,7 +68,7 @@ function ProductModal({ product, onClose, onSave }) {
         originalPrice: form.originalPrice ? parseFloat(form.originalPrice) : null,
         badge: form.badge || null,
       }
-      const url = product ? `/api/products/${product.id}` : '/api/products'
+      const url = product ? apiUrl(`/api/products/${product.id}`) : apiUrl('/api/products')
       const method = product ? 'PUT' : 'POST'
       const res = await fetch(url, {
         method,
@@ -107,6 +114,19 @@ function ProductModal({ product, onClose, onSave }) {
             </div>
 
             <div>
+              <label className="text-white/40 text-xs uppercase tracking-wide block mb-1.5">Type</label>
+              <select value={form.productType} onChange={(e) => {
+                const nextType = e.target.value
+                const nextCategory = nextType === 'apparel' ? APPAREL_CATEGORIES[0] : SHOE_CATEGORIES[0]
+                setForm((f) => ({ ...f, productType: nextType, category: nextCategory, sizes: [] }))
+              }}
+                className="w-full bg-black border border-white/10 text-white px-3 py-2.5 text-sm outline-none focus:border-white/30 transition-colors cursor-pointer">
+                <option value="shoes" className="bg-black">Shoes</option>
+                <option value="apparel" className="bg-black">Apparel</option>
+              </select>
+            </div>
+
+            <div>
               <label className="text-white/40 text-xs uppercase tracking-wide block mb-1.5">Brand</label>
               <select value={form.brand} onChange={set('brand')}
                 className="w-full bg-black border border-white/10 text-white px-3 py-2.5 text-sm outline-none focus:border-white/30 transition-colors cursor-pointer">
@@ -118,7 +138,7 @@ function ProductModal({ product, onClose, onSave }) {
               <label className="text-white/40 text-xs uppercase tracking-wide block mb-1.5">Category</label>
               <select value={form.category} onChange={set('category')}
                 className="w-full bg-black border border-white/10 text-white px-3 py-2.5 text-sm outline-none focus:border-white/30 transition-colors cursor-pointer">
-                {CATEGORIES.map(c => <option key={c} value={c} className="bg-black">{c}</option>)}
+                {categories.map(c => <option key={c} value={c} className="bg-black">{c}</option>)}
               </select>
             </div>
 
@@ -137,6 +157,18 @@ function ProductModal({ product, onClose, onSave }) {
                 type="number" min="0" step="0.01" value={form.originalPrice} onChange={set('originalPrice')}
                 className="w-full bg-black border border-white/10 text-white px-3 py-2.5 text-sm outline-none focus:border-white/30 transition-colors"
                 placeholder="Optional"
+              />
+            </div>
+
+            <div className="col-span-2">
+              <label className="text-white/40 text-xs uppercase tracking-wide block mb-1.5">Description</label>
+              <textarea
+                required
+                rows={3}
+                value={form.description}
+                onChange={set('description')}
+                className="w-full bg-black border border-white/10 text-white px-3 py-2.5 text-sm outline-none focus:border-white/30 transition-colors resize-none"
+                placeholder="Write a short product description..."
               />
             </div>
 
@@ -192,9 +224,11 @@ function ProductModal({ product, onClose, onSave }) {
           </div>
 
           <div>
-            <label className="text-white/40 text-xs uppercase tracking-wide block mb-2">Sizes</label>
+            <label className="text-white/40 text-xs uppercase tracking-wide block mb-2">
+              Sizes ({form.productType === 'apparel' ? 'XS-XXL' : 'US'})
+            </label>
             <div className="flex flex-wrap gap-2">
-              {ALL_SIZES.map(size => (
+              {sizeOptions.map(size => (
                 <button
                   key={size}
                   type="button"
@@ -233,7 +267,7 @@ export default function DashboardProducts() {
   const [modal, setModal] = useState(null) // null | 'add' | product object (edit)
 
   useEffect(() => {
-    fetch('/api/products').then(r => r.json()).then(setProducts)
+    fetch(apiUrl('/api/products')).then(r => r.json()).then(setProducts)
   }, [])
 
   const filtered = products.filter(
@@ -250,7 +284,7 @@ export default function DashboardProducts() {
   }
 
   const toggleStock = async (product) => {
-    const updated = await fetch(`/api/products/${product.id}`, {
+    const updated = await fetch(apiUrl(`/api/products/${product.id}`), {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...product, inStock: !product.inStock }),
@@ -260,7 +294,7 @@ export default function DashboardProducts() {
 
   const deleteProduct = async (id) => {
     if (!confirm('Delete this product?')) return
-    await fetch(`/api/products/${id}`, { method: 'DELETE' })
+    await fetch(apiUrl(`/api/products/${id}`), { method: 'DELETE' })
     setProducts(prev => prev.filter(p => p.id !== id))
   }
 
@@ -302,7 +336,7 @@ export default function DashboardProducts() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-white/5">
-                {['Product', 'Brand', 'Category', 'Price', 'Stock', 'Actions'].map((h) => (
+                {['Product', 'Type', 'Brand', 'Category', 'Price', 'Stock', 'Actions'].map((h) => (
                   <th key={h} className="px-5 py-3.5 text-left text-white/30 text-xs font-semibold uppercase tracking-wide">
                     {h}
                   </th>
@@ -318,6 +352,7 @@ export default function DashboardProducts() {
                       <span className="text-white font-medium truncate max-w-[160px]">{product.name}</span>
                     </div>
                   </td>
+                  <td className="px-5 py-3.5 text-white/50 capitalize">{product.productType ?? 'shoes'}</td>
                   <td className="px-5 py-3.5 text-white/50">{product.brand}</td>
                   <td className="px-5 py-3.5 text-white/50">{product.category}</td>
                   <td className="px-5 py-3.5 text-white font-semibold">${product.price}</td>

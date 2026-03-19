@@ -9,16 +9,13 @@ const links = {
 
 export default function Footer() {
   return (
-    <footer className="bg-[#080808] border-t border-white/5">
+    <footer className="dark-surface bg-[#080808] border-t border-white/5 shadow-[0_-8px_24px_rgba(0,0,0,0.04)]">
       <div className="max-w-7xl mx-auto px-6 pt-16 pb-10">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-10 mb-16">
           {/* Brand */}
           <div className="col-span-2">
-            <Link to="/" className="flex items-center gap-2 mb-5">
-              <div className="w-7 h-7 bg-accent rounded-sm flex items-center justify-center">
-                <span className="text-white font-black text-xs">SS</span>
-              </div>
-              <span className="text-white font-black text-lg tracking-tight">SOLE SOCIETY</span>
+            <Link to="/" className="mb-5 inline-block">
+              <span className="text-white font-black text-lg tracking-tight">NO LOGO JUST VIBE</span>
             </Link>
             <p className="text-white/40 text-sm leading-relaxed max-w-xs mb-6">
               Premium sneakers, authenticity guaranteed. Handpicked drops for the culture.
@@ -63,7 +60,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-white/5 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-white/25 text-xs">
-            © 2026 Sole Society. All rights reserved.
+            © 2026 NO LOGO JUST VIBE. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <Link to="/" className="text-white/25 hover:text-white/60 text-xs transition-colors">Privacy</Link>

@@ -12,34 +12,53 @@ import { ArrowRight, ChevronDown } from 'lucide-react'
 export default function Hero() {
   const videoRef = useRef(null)
   const [videoLoaded, setVideoLoaded] = useState(false)
+  const [videoError, setVideoError] = useState(false)
 
   useEffect(() => {
     const v = videoRef.current
     if (!v) return
-    const onLoaded = () => setVideoLoaded(true)
+    const onLoaded = async () => {
+      setVideoLoaded(true)
+      try {
+        await v.play()
+      } catch {
+        setVideoError(true)
+      }
+    }
+    const onError = () => setVideoError(true)
     v.addEventListener('loadeddata', onLoaded)
-    return () => v.removeEventListener('loadeddata', onLoaded)
+    v.addEventListener('error', onError)
+    // Attempt autoplay on mount for stricter browser policies.
+    v.play().catch(() => {})
+    return () => {
+      v.removeEventListener('loadeddata', onLoaded)
+      v.removeEventListener('error', onError)
+    }
   }, [])
 
   return (
-    <section className="relative w-full h-screen min-h-[680px] flex items-center justify-center overflow-hidden bg-black">
+    <section className="dark-surface relative w-full h-screen min-h-[680px] flex items-center justify-center overflow-hidden bg-black">
 
       {/* ── VIDEO BACKGROUND ── */}
       <video
         ref={videoRef}
         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-          videoLoaded ? 'opacity-60' : 'opacity-0'
+          videoLoaded && !videoError ? 'opacity-60' : 'opacity-0'
         }`}
-        src="/hero.mp4"
+        preload="metadata"
         autoPlay
         muted
         loop
         playsInline
-      />
+        webkit-playsinline="true"
+        disablePictureInPicture
+      >
+        <source src="/hero.mp4" type="video/mp4" />
+      </video>
 
       {/* ── FALLBACK BACKGROUND (shown when no video) ── */}
       <div
-        className={`absolute inset-0 transition-opacity duration-1000 ${videoLoaded ? 'opacity-0' : 'opacity-100'}`}
+        className={`absolute inset-0 transition-opacity duration-1000 ${videoLoaded && !videoError ? 'opacity-0' : 'opacity-100'}`}
         style={{
           background: 'radial-gradient(ellipse 80% 60% at 60% 50%, #1a0a00 0%, #0d0d0d 40%, #000 100%)',
         }}
@@ -80,6 +99,9 @@ export default function Hero() {
       {/* ── CONTENT ── */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6">
         <div className="max-w-2xl">
+          <p className="text-white/70 text-xs md:text-sm uppercase tracking-[0.22em] mb-4 animate-fade-up">
+            Welcome to NO LOGO JUST VIBE
+          </p>
 
           {/* Tag */}
           <p className="tag animate-fade-up mb-5 flex items-center gap-2">
@@ -96,7 +118,7 @@ export default function Hero() {
               RUN THE
             </span>
             <span
-              className="block text-accent"
+              className="block text-[#e8e8e8]"
               style={{ fontSize: 'clamp(3.5rem, 9vw, 7.5rem)' }}
             >
               STREETS.

@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { Search, UserCheck, UserX } from 'lucide-react'
+import { apiUrl } from '../../lib/api'
 
 export default function DashboardUsers() {
   const [users, setUsers] = useState([])
   const [search, setSearch] = useState('')
 
   useEffect(() => {
-    fetch('/api/users').then(r => r.json()).then(setUsers)
+    fetch(apiUrl('/api/users')).then(r => r.json()).then(setUsers)
   }, [])
 
   const filtered = users.filter(
@@ -16,7 +17,7 @@ export default function DashboardUsers() {
   )
 
   const toggleActive = async (user) => {
-    const updated = await fetch(`/api/users/${user.id}`, {
+    const updated = await fetch(apiUrl(`/api/users/${user.id}`), {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ active: !user.active }),

@@ -98,10 +98,10 @@ export const products = [
 ]
 
 export const categories = [
-  { id: 1, name: 'Running', count: 24, image: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=500&auto=format&fit=crop' },
-  { id: 2, name: 'Lifestyle', count: 38, image: 'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=500&auto=format&fit=crop' },
-  { id: 3, name: 'Basketball', count: 16, image: 'https://images.unsplash.com/photo-1539185441755-769473a23570?w=500&auto=format&fit=crop' },
-  { id: 4, name: 'Skateboarding', count: 12, image: 'https://images.unsplash.com/photo-1556906781-9a412961a28c?w=500&auto=format&fit=crop' },
+  { id: 1, name: 'Running', count: 24, image: '/uploads/stock-shoe-runner.jpg' },
+  { id: 2, name: 'Lifestyle', count: 38, image: '/uploads/stock-shoe-lifestyle.jpg' },
+  { id: 3, name: 'Hoodies', count: 14, image: '/uploads/stock-hoodie-black.jpg' },
+  { id: 4, name: 'Outerwear', count: 9, image: '/uploads/stock-jacket-shell.jpg' },
 ]
 
 export const stats = {

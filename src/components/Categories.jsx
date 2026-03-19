@@ -4,7 +4,7 @@ import { categories } from '../data/products'
 
 export default function Categories() {
   return (
-    <section className="bg-[#080808] py-20 md:py-28 border-t border-white/5">
+    <section className="dark-surface bg-[#080808] py-20 md:py-28 border-t border-white/5">
       <div className="max-w-7xl mx-auto px-6">
         <div className="mb-12">
           <p className="tag mb-3">Browse By Style</p>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { DollarSign, ShoppingCart, Package, Users, ArrowUpRight } from 'lucide-react'
+import { apiUrl } from '../../lib/api'
 
 const statusColors = {
   Delivered: 'text-green-400 bg-green-400/10',
@@ -15,9 +16,9 @@ export default function Dashboard() {
   const [bestSellers, setBestSellers] = useState([])
 
   useEffect(() => {
-    fetch('/api/stats').then(r => r.json()).then(setStats)
-    fetch('/api/orders?limit=5').then(r => r.json()).then(setRecentOrders)
-    fetch('/api/stats/bestsellers').then(r => r.json()).then(setBestSellers)
+    fetch(apiUrl('/api/stats')).then(r => r.json()).then(setStats)
+    fetch(apiUrl('/api/orders?limit=5')).then(r => r.json()).then(setRecentOrders)
+    fetch(apiUrl('/api/stats/bestsellers')).then(r => r.json()).then(setBestSellers)
   }, [])
 
   const statCards = stats ? [
@@ -38,18 +39,18 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {stats === null ? (
           [...Array(4)].map((_, i) => (
-            <div key={i} className="bg-[#111] border border-white/5 p-5 animate-pulse">
-              <div className="h-3 bg-white/5 w-24 mb-4" />
-              <div className="h-8 bg-white/5 w-16 mb-2" />
-              <div className="h-3 bg-white/5 w-20" />
+            <div key={i} className="bg-[#fffdf8] border border-black/10 p-5 animate-pulse">
+              <div className="h-3 bg-black/10 w-24 mb-4" />
+              <div className="h-8 bg-black/10 w-16 mb-2" />
+              <div className="h-3 bg-black/10 w-20" />
             </div>
           ))
         ) : (
           statCards.map(({ label, value, icon: Icon, sub }) => (
-            <div key={label} className="bg-[#111] border border-white/5 p-5">
+            <div key={label} className="bg-[#fffdf8] border border-black/10 p-5">
               <div className="flex items-start justify-between mb-4">
                 <p className="text-white/40 text-xs font-medium uppercase tracking-wide">{label}</p>
-                <div className="w-8 h-8 bg-white/5 flex items-center justify-center">
+                <div className="w-8 h-8 bg-black/5 flex items-center justify-center">
                   <Icon size={15} className="text-white/40" />
                 </div>
               </div>
@@ -62,7 +63,7 @@ export default function Dashboard() {
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Recent orders */}
-        <div className="lg:col-span-2 bg-[#111] border border-white/5">
+        <div className="lg:col-span-2 bg-[#fffdf8] border border-black/10">
           <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
             <h2 className="text-white font-semibold text-sm">Recent Orders</h2>
             <Link to="/admin/orders" className="text-white/30 hover:text-white text-xs font-medium transition-colors flex items-center gap-1">
@@ -83,7 +84,7 @@ export default function Dashboard() {
                 </thead>
                 <tbody>
                   {recentOrders.map(order => (
-                    <tr key={order.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-colors">
+                    <tr key={order.id} className="border-b border-white/5 last:border-0 hover:bg-black/[0.03] transition-colors">
                       <td className="px-5 py-3.5 text-white/60 font-mono text-xs">{order.id}</td>
                       <td className="px-5 py-3.5 text-white font-medium">{order.customer}</td>
                       <td className="px-5 py-3.5 text-white/60 text-xs truncate max-w-[140px]">{order.product}</td>
@@ -102,7 +103,7 @@ export default function Dashboard() {
         </div>
 
         {/* Best sellers */}
-        <div className="bg-[#111] border border-white/5">
+        <div className="bg-[#fffdf8] border border-black/10">
           <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
             <h2 className="text-white font-semibold text-sm">Best Sellers</h2>
             <Link to="/admin/products" className="text-white/30 hover:text-white text-xs transition-colors">

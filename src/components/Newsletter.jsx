@@ -43,9 +43,9 @@ export default function Newsletter() {
             />
             <button
               type="submit"
-              className="bg-black text-white px-6 py-3.5 font-semibold text-sm tracking-wide uppercase hover:bg-white hover:text-black transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
+              className="newsletter-go px-6 py-3.5 font-semibold text-sm tracking-wide uppercase transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
             >
-              Subscribe <ArrowRight size={15} />
+              GO <ArrowRight size={15} />
             </button>
           </form>
         )}

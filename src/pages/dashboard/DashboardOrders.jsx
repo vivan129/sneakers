@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Search } from 'lucide-react'
+import { apiUrl } from '../../lib/api'
 
 const statusColors = {
   Delivered: 'text-green-400 bg-green-400/10',
@@ -16,7 +17,7 @@ export default function DashboardOrders() {
   const [filterStatus, setFilterStatus] = useState('All')
 
   useEffect(() => {
-    fetch('/api/orders').then(r => r.json()).then(setOrders)
+    fetch(apiUrl('/api/orders')).then(r => r.json()).then(setOrders)
   }, [])
 
   const filtered = orders

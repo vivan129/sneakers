@@ -4,8 +4,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        accent: '#FF4D00',
-        'accent-hover': '#e64400',
+        accent: '#111111',
+        'accent-hover': '#000000',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

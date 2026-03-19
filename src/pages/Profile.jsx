@@ -4,6 +4,7 @@ import { Package, ShoppingBag, Calendar, LogOut } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { useAuth } from '../context/AuthContext'
+import { apiUrl } from '../lib/api'
 
 const statusColors = {
   Delivered: 'text-green-400 bg-green-400/10',
@@ -21,8 +22,8 @@ export default function Profile() {
   useEffect(() => {
     if (!user) return
     Promise.all([
-      fetch(`/api/users/${user.id}`).then(r => r.json()),
-      fetch(`/api/orders?userId=${user.id}`).then(r => r.json()),
+      fetch(apiUrl(`/api/users/${user.id}`)).then(r => r.json()),
+      fetch(apiUrl(`/api/orders?userId=${user.id}`)).then(r => r.json()),
     ]).then(([u, o]) => {
       setUserData(u)
       setOrders(o)
@@ -37,7 +38,7 @@ export default function Profile() {
     : '—'
 
   return (
-    <div className="bg-black min-h-screen">
+    <div className="dashboard-light bg-black min-h-screen">
       <Navbar />
 
       <div className="max-w-4xl mx-auto px-6 pt-28 pb-20">

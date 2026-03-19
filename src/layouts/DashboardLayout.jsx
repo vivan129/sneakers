@@ -20,20 +20,17 @@ export default function DashboardLayout() {
   const handleLogout = () => { logout(); navigate('/') }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex">
+    <div className="dashboard-light min-h-screen bg-[#0a0a0a] flex">
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 w-60 bg-[#0d0d0d] border-r border-white/5 flex flex-col transition-transform duration-300 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } md:translate-x-0`}
       >
-        {/* Logo */}
+        {/* Brand text only */}
         <div className="h-16 flex items-center justify-between px-5 border-b border-white/5">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-accent rounded-sm flex items-center justify-center">
-              <span className="text-white font-black text-[10px]">SS</span>
-            </div>
-            <span className="text-white font-bold text-sm tracking-tight">SOLE SOCIETY</span>
+          <div>
+            <span className="text-white font-bold text-sm tracking-tight">NO LOGO JUST VIBE</span>
           </div>
           <button className="md:hidden text-white/40 hover:text-white" onClick={() => setSidebarOpen(false)}>
             <X size={18} />

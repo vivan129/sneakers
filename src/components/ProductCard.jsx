@@ -105,6 +105,9 @@ export default function ProductCard({ product }) {
         <div className="p-4">
           <p className="text-white/40 text-xs font-medium mb-1">{product.brand}</p>
           <h3 className="text-white font-semibold text-sm mb-2 truncate">{product.name}</h3>
+          {product.description && (
+            <p className="text-white/40 text-xs leading-relaxed line-clamp-2 mb-2">{product.description}</p>
+          )}
           <div className="flex items-center gap-2">
             <span className="text-white font-bold">${product.price}</span>
             {product.originalPrice && <span className="text-white/30 text-sm line-through">${product.originalPrice}</span>}

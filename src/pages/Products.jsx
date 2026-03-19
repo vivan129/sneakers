@@ -3,9 +3,7 @@ import { SlidersHorizontal, X } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import ProductCard from '../components/ProductCard'
-
-const BRANDS = ['All', 'Nike', 'Adidas', 'Jordan', 'Converse']
-const CATEGORIES = ['All', 'Running', 'Lifestyle', 'Basketball', 'Skateboarding']
+import { apiUrl } from '../lib/api'
 
 export default function Products() {
   const [products, setProducts] = useState([])
@@ -14,8 +12,11 @@ export default function Products() {
   const [sortBy, setSortBy] = useState('default')
 
   useEffect(() => {
-    fetch('/api/products').then(r => r.json()).then(setProducts)
+    fetch(apiUrl('/api/products')).then(r => r.json()).then(setProducts)
   }, [])
+
+  const brandOptions = ['All', ...Array.from(new Set(products.map(p => p.brand))).sort()]
+  const categoryOptions = ['All', ...Array.from(new Set(products.map(p => p.category))).sort()]
 
   const filtered = products
     .filter(p => activeBrand === 'All' || p.brand === activeBrand)
@@ -30,7 +31,7 @@ export default function Products() {
     <div className="bg-black min-h-screen">
       <Navbar />
 
-      <div className="pt-28 pb-10 border-b border-white/5">
+      <div className="dark-surface pt-28 pb-10 border-b border-white/5 bg-[#0d0d0d]">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-white font-black text-4xl md:text-5xl tracking-tight mb-2">All Products</h1>
           <p className="text-white/40 text-sm">{filtered.length} styles</p>
@@ -45,7 +46,7 @@ export default function Products() {
             <span className="text-white/40 text-xs font-semibold uppercase tracking-widest">Filter</span>
           </div>
           <div className="flex flex-wrap gap-2">
-            {BRANDS.map(b => (
+            {brandOptions.map(b => (
               <button key={b} onClick={() => setActiveBrand(b)}
                 className={`px-3 py-1.5 text-xs font-semibold tracking-wide uppercase transition-colors border ${activeBrand === b ? 'bg-white text-black border-white' : 'border-white/10 text-white/50 hover:border-white/30 hover:text-white'}`}>
                 {b}
@@ -53,7 +54,7 @@ export default function Products() {
             ))}
           </div>
           <div className="flex flex-wrap gap-2">
-            {CATEGORIES.map(c => (
+            {categoryOptions.map(c => (
               <button key={c} onClick={() => setActiveCategory(c)}
                 className={`px-3 py-1.5 text-xs font-semibold tracking-wide uppercase transition-colors border ${activeCategory === c ? 'bg-accent text-white border-accent' : 'border-white/10 text-white/50 hover:border-white/30 hover:text-white'}`}>
                 {c}
@@ -70,7 +71,7 @@ export default function Products() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="dark-surface grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filtered.map(product => <ProductCard key={product.id} product={product} />)}
         </div>
 

@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import ProductCard from '../components/ProductCard'
 import { useCart } from '../context/CartContext'
+import { apiUrl } from '../lib/api'
 
 const badgeColors = {
   New: 'bg-accent text-white', Hot: 'bg-white text-black', Limited: 'bg-purple-500 text-white',
@@ -20,13 +21,14 @@ export default function ProductDetail() {
   const [selectedSize, setSelectedSize] = useState(null)
   const [added, setAdded] = useState(false)
   const [wishlist, setWishlist] = useState(false)
+  const needsSizeSelection = product?.sizes?.length > 0
 
   useEffect(() => {
     setLoading(true)
     setSelectedSize(null)
     Promise.all([
-      fetch(`/api/products/${id}`).then(r => r.ok ? r.json() : null),
-      fetch('/api/products').then(r => r.json()),
+      fetch(apiUrl(`/api/products/${id}`)).then(r => r.ok ? r.json() : null),
+      fetch(apiUrl('/api/products')).then(r => r.json()),
     ]).then(([prod, all]) => {
       setProduct(prod)
       if (prod) setRelated(all.filter(p => p.category === prod.category && p.id !== prod.id).slice(0, 4))
@@ -35,8 +37,8 @@ export default function ProductDetail() {
   }, [id])
 
   const handleAddToCart = () => {
-    if (!product.inStock || !selectedSize) return
-    addItem(product, selectedSize)
+    if (!product.inStock || (needsSizeSelection && !selectedSize)) return
+    addItem(product, needsSizeSelection ? selectedSize : null)
     setAdded(true)
     setTimeout(() => setAdded(false), 1800)
   }
@@ -102,6 +104,9 @@ export default function ProductDetail() {
             <p className="text-white/40 text-sm font-medium mb-2">{product.brand}</p>
             <h1 className="text-white font-black text-3xl lg:text-4xl tracking-tight mb-4">{product.name}</h1>
             <p className="text-white/30 text-xs uppercase tracking-widest mb-6">{product.category}</p>
+            {product.description && (
+              <p className="text-white/60 text-sm leading-relaxed mb-7 max-w-xl">{product.description}</p>
+            )}
 
             {/* Price */}
             <div className="flex items-baseline gap-3 mb-8">
@@ -117,10 +122,12 @@ export default function ProductDetail() {
             </div>
 
             {/* Size selector */}
-            {product.inStock && product.sizes.length > 0 && (
+            {product.inStock && needsSizeSelection && (
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-white/60 text-xs uppercase tracking-wide font-semibold">Select Size (US)</span>
+                  <span className="text-white/60 text-xs uppercase tracking-wide font-semibold">
+                    {product.productType === 'apparel' ? 'Select Size' : 'Select Size (US)'}
+                  </span>
                   {!selectedSize && <span className="text-accent text-xs">Please select a size</span>}
                 </div>
                 <div className="grid grid-cols-5 gap-2">
@@ -145,17 +152,17 @@ export default function ProductDetail() {
             <div className="flex gap-3 mb-8">
               <button
                 onClick={handleAddToCart}
-                disabled={!product.inStock || (product.sizes.length > 0 && !selectedSize)}
+                disabled={!product.inStock || (needsSizeSelection && !selectedSize)}
                 className={`flex-1 flex items-center justify-center gap-2 py-4 font-bold text-sm uppercase tracking-wide transition-all duration-200 ${
                   added
                     ? 'bg-green-500 text-white'
-                    : product.inStock && (product.sizes.length === 0 || selectedSize)
+                    : product.inStock && (!needsSizeSelection || selectedSize)
                     ? 'bg-accent text-white hover:bg-accent-hover active:scale-95'
                     : 'bg-white/5 text-white/30 cursor-not-allowed'
                 }`}
               >
                 <ShoppingBag size={16} />
-                {added ? 'Added to Bag!' : !product.inStock ? 'Sold Out' : !selectedSize && product.sizes.length > 0 ? 'Select a Size' : 'Add to Bag'}
+                {added ? 'Added to Bag!' : !product.inStock ? 'Sold Out' : !selectedSize && needsSizeSelection ? 'Select a Size' : 'Add to Bag'}
               </button>
               <button
                 onClick={() => setWishlist(!wishlist)}
@@ -181,7 +188,7 @@ export default function ProductDetail() {
                   {product.inStock ? 'In Stock' : 'Sold Out'}
                 </span>
               </div>
-              {product.sizes.length > 0 && (
+              {needsSizeSelection && (
                 <div className="flex justify-between text-sm">
                   <span className="text-white/40">Available Sizes</span>
                   <span className="text-white font-medium">{product.sizes.join(', ')}</span>

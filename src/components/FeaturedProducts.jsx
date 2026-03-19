@@ -2,16 +2,17 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import ProductCard from './ProductCard'
+import { apiUrl } from '../lib/api'
 
 export default function FeaturedProducts() {
   const [products, setProducts] = useState([])
 
   useEffect(() => {
-    fetch('/api/products').then(r => r.json()).then(data => setProducts(data.slice(0, 8)))
+    fetch(apiUrl('/api/products')).then(r => r.json()).then(data => setProducts(data.slice(0, 8)))
   }, [])
 
   return (
-    <section id="featured" className="bg-black py-20 md:py-28">
+    <section id="featured" className="dark-surface bg-black py-20 md:py-28">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-end justify-between mb-12">
           <div>

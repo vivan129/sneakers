@@ -33,7 +33,9 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS products (
     id            INTEGER PRIMARY KEY AUTOINCREMENT,
     name          TEXT    NOT NULL,
+    description   TEXT    NOT NULL DEFAULT '',
     brand         TEXT    NOT NULL,
+    productType   TEXT    NOT NULL DEFAULT 'shoes',
     price         REAL    NOT NULL,
     originalPrice REAL,
     image         TEXT    NOT NULL,
@@ -73,21 +75,52 @@ try { db.exec('ALTER TABLE orders ADD COLUMN amountNum REAL') } catch {}
 try { db.exec('ALTER TABLE orders ADD COLUMN items TEXT') } catch {}
 try { db.exec('ALTER TABLE orders ADD COLUMN shipping TEXT') } catch {}
 try { db.exec('ALTER TABLE orders ADD COLUMN createdAt INTEGER') } catch {}
+try { db.exec("ALTER TABLE products ADD COLUMN description TEXT NOT NULL DEFAULT ''") } catch {}
+try { db.exec("ALTER TABLE products ADD COLUMN productType TEXT NOT NULL DEFAULT 'shoes'") } catch {}
+db.exec(`UPDATE products SET description = 'Premium quality product.' WHERE description IS NULL OR TRIM(description) = ''`)
+db.exec(`UPDATE products SET productType = 'shoes' WHERE productType IS NULL OR TRIM(productType) = ''`)
 
 // ── Seed data ─────────────────────────────────────────────────────────────────
 if (db.prepare('SELECT COUNT(*) as c FROM products').get().c === 0) {
-  const ins = db.prepare(`INSERT INTO products (name,brand,price,originalPrice,image,category,badge,sizes,inStock) VALUES (@name,@brand,@price,@originalPrice,@image,@category,@badge,@sizes,@inStock)`)
+  const ins = db.prepare(`INSERT INTO products (name,description,brand,productType,price,originalPrice,image,category,badge,sizes,inStock) VALUES (@name,@description,@brand,@productType,@price,@originalPrice,@image,@category,@badge,@sizes,@inStock)`)
   db.transaction(rows => rows.forEach(r => ins.run(r)))([
-    { name:'Air Phantom X',      brand:'Nike',     price:189, originalPrice:240,  image:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&auto=format&fit=crop',  category:'Running',       badge:'New',       sizes:'[7,8,9,10,11,12]',   inStock:1 },
-    { name:'Ultra Boost 22',     brand:'Adidas',   price:165, originalPrice:null, image:'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=600&auto=format&fit=crop',  category:'Running',       badge:'Hot',       sizes:'[7,8,9,10,11]',      inStock:1 },
-    { name:'Air Force 1 OG',     brand:'Nike',     price:120, originalPrice:null, image:'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=600&auto=format&fit=crop',  category:'Lifestyle',     badge:null,        sizes:'[6,7,8,9,10,11,12]', inStock:1 },
-    { name:'Yeezy 350 V2',       brand:'Adidas',   price:240, originalPrice:280,  image:'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&auto=format&fit=crop',  category:'Lifestyle',     badge:'Limited',   sizes:'[8,9,10]',           inStock:1 },
-    { name:'React Infinity Run',  brand:'Nike',    price:155, originalPrice:null, image:'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=600&auto=format&fit=crop',  category:'Running',       badge:null,        sizes:'[7,8,9,10,11,12]',   inStock:1 },
-    { name:'Chuck 70 Hi',        brand:'Converse', price:95,  originalPrice:null, image:'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=600&auto=format&fit=crop',  category:'Lifestyle',     badge:'Classic',   sizes:'[6,7,8,9,10,11]',    inStock:1 },
-    { name:'Air Jordan 1 Retro',  brand:'Jordan',  price:310, originalPrice:null, image:'https://images.unsplash.com/photo-1539185441755-769473a23570?w=600&auto=format&fit=crop',  category:'Basketball',    badge:'Exclusive', sizes:'[8,9,10,11]',        inStock:0 },
-    { name:'SB Dunk Low',        brand:'Nike',     price:130, originalPrice:160,  image:'https://images.unsplash.com/photo-1556906781-9a412961a28c?w=600&auto=format&fit=crop',  category:'Skateboarding', badge:'Sale',      sizes:'[7,8,9,10]',         inStock:1 },
+    { name:'Air Phantom X', description:'High-cushion daily runner with breathable mesh upper.', brand:'Nike', productType:'shoes', price:189, originalPrice:240, image:'/uploads/stock-shoe-runner.jpg', category:'Running', badge:'New', sizes:'[7,8,9,10,11,12]', inStock:1 },
+    { name:'Ultra Boost 22', description:'Energy-return foam and secure knit fit for long runs.', brand:'Adidas', productType:'shoes', price:165, originalPrice:null, image:'/uploads/stock-shoe-trainer.jpg', category:'Running', badge:'Hot', sizes:'[7,8,9,10,11]', inStock:1 },
+    { name:'Air Force 1 OG', description:'Iconic everyday sneaker with classic street profile.', brand:'Nike', productType:'shoes', price:120, originalPrice:null, image:'/uploads/stock-shoe-lifestyle.jpg', category:'Lifestyle', badge:null, sizes:'[6,7,8,9,10,11,12]', inStock:1 },
+    { name:'Cityline Hoodie', description:'Heavyweight brushed-cotton hoodie with relaxed fit.', brand:'NO LOGO', productType:'apparel', price:98, originalPrice:120, image:'/uploads/stock-hoodie-black.jpg', category:'Hoodies', badge:'New', sizes:'["S","M","L","XL"]', inStock:1 },
+    { name:'Studio Oversized Tee', description:'Premium oversized tee in soft structured cotton.', brand:'NO LOGO', productType:'apparel', price:44, originalPrice:null, image:'/uploads/stock-tee-oversized.jpg', category:'Tops', badge:null, sizes:'["S","M","L","XL","XXL"]', inStock:1 },
+    { name:'Tech Fleece Joggers', description:'Slim tapered joggers with zip pockets and stretch waist.', brand:'NO LOGO', productType:'apparel', price:76, originalPrice:92, image:'/uploads/stock-joggers-tech.jpg', category:'Bottoms', badge:'Sale', sizes:'["S","M","L","XL"]', inStock:1 },
+    { name:'Windbreaker Shell', description:'Lightweight weather-resistant shell for layered fits.', brand:'NO LOGO', productType:'apparel', price:112, originalPrice:null, image:'/uploads/stock-jacket-shell.jpg', category:'Outerwear', badge:'Limited', sizes:'["M","L","XL"]', inStock:1 },
+    { name:'Court Vision High', description:'Retro court silhouette made for street and weekend wear.', brand:'Jordan', productType:'shoes', price:210, originalPrice:null, image:'/uploads/stock-shoe-basketball.jpg', category:'Basketball', badge:'Exclusive', sizes:'[8,9,10,11]', inStock:0 },
   ])
 }
+
+const upsertProduct = db.prepare(`
+  INSERT INTO products (name,description,brand,productType,price,originalPrice,image,category,badge,sizes,inStock)
+  VALUES (@name,@description,@brand,@productType,@price,@originalPrice,@image,@category,@badge,@sizes,@inStock)
+  ON CONFLICT(name) DO UPDATE SET
+    description=excluded.description,
+    brand=excluded.brand,
+    productType=excluded.productType,
+    price=excluded.price,
+    originalPrice=excluded.originalPrice,
+    image=excluded.image,
+    category=excluded.category,
+    badge=excluded.badge,
+    sizes=excluded.sizes,
+    inStock=excluded.inStock
+`)
+try { db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_products_name_unique ON products(name)') } catch {}
+db.transaction(rows => rows.forEach(r => upsertProduct.run(r)))([
+  { name:'Air Phantom X', description:'High-cushion daily runner with breathable mesh upper.', brand:'Nike', productType:'shoes', price:189, originalPrice:240, image:'/uploads/stock-shoe-runner.jpg', category:'Running', badge:'New', sizes:'[7,8,9,10,11,12]', inStock:1 },
+  { name:'Ultra Boost 22', description:'Energy-return foam and secure knit fit for long runs.', brand:'Adidas', productType:'shoes', price:165, originalPrice:null, image:'/uploads/stock-shoe-trainer.jpg', category:'Running', badge:'Hot', sizes:'[7,8,9,10,11]', inStock:1 },
+  { name:'Air Force 1 OG', description:'Iconic everyday sneaker with classic street profile.', brand:'Nike', productType:'shoes', price:120, originalPrice:null, image:'/uploads/stock-shoe-lifestyle.jpg', category:'Lifestyle', badge:null, sizes:'[6,7,8,9,10,11,12]', inStock:1 },
+  { name:'Court Vision High', description:'Retro court silhouette made for street and weekend wear.', brand:'Jordan', productType:'shoes', price:210, originalPrice:null, image:'/uploads/stock-shoe-basketball.jpg', category:'Basketball', badge:'Exclusive', sizes:'[8,9,10,11]', inStock:0 },
+  { name:'Cityline Hoodie', description:'Heavyweight brushed-cotton hoodie with relaxed fit.', brand:'NO LOGO', productType:'apparel', price:98, originalPrice:120, image:'/uploads/stock-hoodie-black.jpg', category:'Hoodies', badge:'New', sizes:'["S","M","L","XL"]', inStock:1 },
+  { name:'Studio Oversized Tee', description:'Premium oversized tee in soft structured cotton.', brand:'NO LOGO', productType:'apparel', price:44, originalPrice:null, image:'/uploads/stock-tee-oversized.jpg', category:'Tops', badge:null, sizes:'["S","M","L","XL","XXL"]', inStock:1 },
+  { name:'Tech Fleece Joggers', description:'Slim tapered joggers with zip pockets and stretch waist.', brand:'NO LOGO', productType:'apparel', price:76, originalPrice:92, image:'/uploads/stock-joggers-tech.jpg', category:'Bottoms', badge:'Sale', sizes:'["S","M","L","XL"]', inStock:1 },
+  { name:'Windbreaker Shell', description:'Lightweight weather-resistant shell for layered fits.', brand:'NO LOGO', productType:'apparel', price:112, originalPrice:null, image:'/uploads/stock-jacket-shell.jpg', category:'Outerwear', badge:'Limited', sizes:'["M","L","XL"]', inStock:1 },
+])
 
 if (db.prepare('SELECT COUNT(*) as c FROM orders').get().c === 0) {
   const ins = db.prepare(`INSERT INTO orders (id,customer,product,amount,status,date) VALUES (@id,@customer,@product,@amount,@status,@date)`)
@@ -120,7 +153,21 @@ if (db.prepare('SELECT COUNT(*) as c FROM users').get().c === 0) {
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-const parseProduct = (p) => ({ ...p, sizes: JSON.parse(p.sizes), inStock: Boolean(p.inStock), originalPrice: p.originalPrice ?? null })
+const getBaseUrl = (req) => `${req.headers['x-forwarded-proto'] || req.protocol}://${req.get('host')}`
+const toPublicAssetUrl = (url, req) => {
+  if (!url) return url
+  return url.startsWith('/uploads/') ? `${getBaseUrl(req)}${url}` : url
+}
+
+const parseProduct = (p, req) => ({
+  ...p,
+  description: p.description ?? '',
+  productType: p.productType || 'shoes',
+  image: toPublicAssetUrl(p.image, req),
+  sizes: JSON.parse(p.sizes || '[]'),
+  inStock: Boolean(p.inStock),
+  originalPrice: p.originalPrice ?? null,
+})
 const safeUser = (u) => { const { password: _, ...rest } = u; return { ...rest, active: Boolean(rest.active) } }
 
 const nextOrderId = () => {
@@ -140,29 +187,31 @@ app.use('/uploads', express.static(uploadsDir))
 // ── Upload ────────────────────────────────────────────────────────────────────
 app.post('/api/upload', upload.single('image'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No image provided' })
-  res.json({ url: `/uploads/${req.file.filename}` })
+  res.json({ url: `${getBaseUrl(req)}/uploads/${req.file.filename}` })
 })
 
 // ── Products ──────────────────────────────────────────────────────────────────
-app.get('/api/products', (_req, res) => res.json(db.prepare('SELECT * FROM products').all().map(parseProduct)))
+app.get('/api/products', (req, res) => res.json(db.prepare('SELECT * FROM products').all().map((p) => parseProduct(p, req))))
 
 app.get('/api/products/:id', (req, res) => {
   const row = db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id)
   if (!row) return res.status(404).json({ error: 'Not found' })
-  res.json(parseProduct(row))
+  res.json(parseProduct(row, req))
 })
 
 app.post('/api/products', (req, res) => {
-  const { name, brand, price, originalPrice, image, category, badge, sizes, inStock } = req.body
-  const result = db.prepare(`INSERT INTO products (name,brand,price,originalPrice,image,category,badge,sizes,inStock) VALUES (?,?,?,?,?,?,?,?,?)`).run(name, brand, price, originalPrice ?? null, image, category, badge ?? null, JSON.stringify(sizes ?? []), inStock ? 1 : 0)
-  res.status(201).json(parseProduct(db.prepare('SELECT * FROM products WHERE id = ?').get(result.lastInsertRowid)))
+  const { name, description, brand, productType, price, originalPrice, image, category, badge, sizes, inStock } = req.body
+  const result = db.prepare(`INSERT INTO products (name,description,brand,productType,price,originalPrice,image,category,badge,sizes,inStock) VALUES (?,?,?,?,?,?,?,?,?,?,?)`)
+    .run(name, description ?? '', brand, productType ?? 'shoes', price, originalPrice ?? null, image, category, badge ?? null, JSON.stringify(sizes ?? []), inStock ? 1 : 0)
+  res.status(201).json(parseProduct(db.prepare('SELECT * FROM products WHERE id = ?').get(result.lastInsertRowid), req))
 })
 
 app.put('/api/products/:id', (req, res) => {
-  const { name, brand, price, originalPrice, image, category, badge, sizes, inStock } = req.body
-  const info = db.prepare(`UPDATE products SET name=?,brand=?,price=?,originalPrice=?,image=?,category=?,badge=?,sizes=?,inStock=? WHERE id=?`).run(name, brand, price, originalPrice ?? null, image, category, badge ?? null, JSON.stringify(sizes ?? []), inStock ? 1 : 0, req.params.id)
+  const { name, description, brand, productType, price, originalPrice, image, category, badge, sizes, inStock } = req.body
+  const info = db.prepare(`UPDATE products SET name=?,description=?,brand=?,productType=?,price=?,originalPrice=?,image=?,category=?,badge=?,sizes=?,inStock=? WHERE id=?`)
+    .run(name, description ?? '', brand, productType ?? 'shoes', price, originalPrice ?? null, image, category, badge ?? null, JSON.stringify(sizes ?? []), inStock ? 1 : 0, req.params.id)
   if (info.changes === 0) return res.status(404).json({ error: 'Not found' })
-  res.json(parseProduct(db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id)))
+  res.json(parseProduct(db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id), req))
 })
 
 app.delete('/api/products/:id', (req, res) => {
@@ -271,7 +320,7 @@ app.get('/api/stats', (_req, res) => {
 })
 
 // ── Best sellers ──────────────────────────────────────────────────────────────
-app.get('/api/stats/bestsellers', (_req, res) => {
+app.get('/api/stats/bestsellers', (req, res) => {
   // Aggregate sold qty from items JSON of real orders
   const orders = db.prepare('SELECT items FROM orders WHERE items IS NOT NULL AND items != \'[]\'').all()
   const counts = {}
@@ -286,7 +335,7 @@ app.get('/api/stats/bestsellers', (_req, res) => {
   const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5)
   const results = sorted.map(([productId, sold]) => {
     const p = db.prepare('SELECT * FROM products WHERE id = ?').get(productId)
-    return p ? { ...parseProduct(p), sold } : null
+    return p ? { ...parseProduct(p, req), sold } : null
   }).filter(Boolean)
 
   // Pad with regular products if fewer than 5 best sellers
@@ -295,7 +344,7 @@ app.get('/api/stats/bestsellers', (_req, res) => {
     const rest = db.prepare('SELECT * FROM products').all()
       .filter(p => !existing.has(p.id))
       .slice(0, 5 - results.length)
-      .map(p => ({ ...parseProduct(p), sold: 0 }))
+      .map(p => ({ ...parseProduct(p, req), sold: 0 }))
     results.push(...rest)
   }
   res.json(results)

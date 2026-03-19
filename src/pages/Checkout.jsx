@@ -4,6 +4,7 @@ import { ShoppingBag } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
+import { apiUrl } from '../lib/api'
 
 export default function Checkout() {
   const { user } = useAuth()
@@ -33,7 +34,7 @@ export default function Checkout() {
     setError('')
     setLoading(true)
     try {
-      const res = await fetch('/api/orders', {
+      const res = await fetch(apiUrl('/api/orders'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -5,7 +5,7 @@ import Database from 'better-sqlite3'
 import { createHash } from 'crypto'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
-import { mkdirSync } from 'fs'
+import { mkdirSync, existsSync } from 'fs'
 
 const hashPw = (pw) => createHash('sha256').update(pw).digest('hex')
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -368,11 +368,11 @@ app.post('/api/auth/login', (req, res) => {
   res.json(safeUser(row))
 })
 
-// ── Serve React build in production ──────────────────────────────────────────
-if (process.env.NODE_ENV === 'production') {
-  const distDir = join(__dirname, '../dist')
+// ── Serve React build (SPA fallback) ─────────────────────────────────────────
+const distDir = join(__dirname, '../dist')
+if (existsSync(join(distDir, 'index.html'))) {
   app.use(express.static(distDir))
-  app.get('*', (_req, res) => res.sendFile(join(distDir, 'index.html')))
+  app.get(/^\/(?!api|uploads).*/, (_req, res) => res.sendFile(join(distDir, 'index.html')))
 }
 
 // ── Start ─────────────────────────────────────────────────────────────────────

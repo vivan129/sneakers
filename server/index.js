@@ -95,23 +95,30 @@ if (db.prepare('SELECT COUNT(*) as c FROM products').get().c === 0) {
   ])
 }
 
-const upsertProduct = db.prepare(`
+const findProductByName = db.prepare('SELECT id FROM products WHERE name = ?')
+const insertProductByName = db.prepare(`
   INSERT INTO products (name,description,brand,productType,price,originalPrice,image,category,badge,sizes,inStock)
   VALUES (@name,@description,@brand,@productType,@price,@originalPrice,@image,@category,@badge,@sizes,@inStock)
-  ON CONFLICT(name) DO UPDATE SET
-    description=excluded.description,
-    brand=excluded.brand,
-    productType=excluded.productType,
-    price=excluded.price,
-    originalPrice=excluded.originalPrice,
-    image=excluded.image,
-    category=excluded.category,
-    badge=excluded.badge,
-    sizes=excluded.sizes,
-    inStock=excluded.inStock
 `)
-try { db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_products_name_unique ON products(name)') } catch {}
-db.transaction(rows => rows.forEach(r => upsertProduct.run(r)))([
+const updateProductByName = db.prepare(`
+  UPDATE products
+  SET description=@description,
+      brand=@brand,
+      productType=@productType,
+      price=@price,
+      originalPrice=@originalPrice,
+      image=@image,
+      category=@category,
+      badge=@badge,
+      sizes=@sizes,
+      inStock=@inStock
+  WHERE name=@name
+`)
+db.transaction(rows => rows.forEach((row) => {
+  const exists = findProductByName.get(row.name)
+  if (exists) updateProductByName.run(row)
+  else insertProductByName.run(row)
+}))([
   { name:'Air Phantom X', description:'High-cushion daily runner with breathable mesh upper.', brand:'Nike', productType:'shoes', price:189, originalPrice:240, image:'/uploads/stock-shoe-runner.jpg', category:'Running', badge:'New', sizes:'[7,8,9,10,11,12]', inStock:1 },
   { name:'Ultra Boost 22', description:'Energy-return foam and secure knit fit for long runs.', brand:'Adidas', productType:'shoes', price:165, originalPrice:null, image:'/uploads/stock-shoe-trainer.jpg', category:'Running', badge:'Hot', sizes:'[7,8,9,10,11]', inStock:1 },
   { name:'Air Force 1 OG', description:'Iconic everyday sneaker with classic street profile.', brand:'Nike', productType:'shoes', price:120, originalPrice:null, image:'/uploads/stock-shoe-lifestyle.jpg', category:'Lifestyle', badge:null, sizes:'[6,7,8,9,10,11,12]', inStock:1 },

@@ -380,6 +380,10 @@ const distDir = join(__dirname, '../dist')
 if (existsSync(join(distDir, 'index.html'))) {
   app.use(express.static(distDir))
   app.get(/^\/(?!api|uploads).*/, (_req, res) => res.sendFile(join(distDir, 'index.html')))
+} else {
+  app.get('/', (_req, res) => {
+    res.status(503).send('Frontend build not found. Run "npm run build" before starting the server.')
+  })
 }
 
 // ── Start ─────────────────────────────────────────────────────────────────────

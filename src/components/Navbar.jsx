@@ -69,8 +69,13 @@ export default function Navbar() {
       <header className={`fixed top-0 left-0 right-0 z-30 transition-all duration-300 ${headerSolid ? 'bg-black/95 backdrop-blur-sm border-b border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)]' : 'bg-transparent dark-surface dark-surface--transparent'}`}>
         <nav className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16 md:h-20">
           {/* Brand text only */}
-          <Link to="/" className="group">
-            <span className="text-white font-black text-lg tracking-tight group-hover:text-accent transition-colors">NO LOGO JUST VIBE</span>
+          <Link to="/" className="group leading-none">
+            <span className="block text-white font-black text-2xl tracking-tight group-hover:text-accent transition-colors">
+              NO LOGO JUST VIBE
+            </span>
+            <p className="text-[10px] md:text-xs text-white/50 mt-1 transition-colors group-hover:text-white/70">
+              You don&apos;t wear a product. You wear a legacy
+            </p>
           </Link>
 
           {/* Desktop nav */}

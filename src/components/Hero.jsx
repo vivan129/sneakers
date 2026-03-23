@@ -13,6 +13,7 @@ export default function Hero() {
   const videoRef = useRef(null)
   const [videoLoaded, setVideoLoaded] = useState(false)
   const [videoError, setVideoError] = useState(false)
+  const [coinTilt, setCoinTilt] = useState({ x: 0, y: 0 })
 
   useEffect(() => {
     const v = videoRef.current
@@ -43,7 +44,7 @@ export default function Hero() {
       <video
         ref={videoRef}
         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-          videoLoaded && !videoError ? 'opacity-60' : 'opacity-0'
+          videoLoaded && !videoError ? 'opacity-100' : 'opacity-0'
         }`}
         preload="metadata"
         autoPlay
@@ -93,66 +94,40 @@ export default function Hero() {
       />
 
       {/* ── GRADIENT OVERLAY ── */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
 
       {/* ── CONTENT ── */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6">
-        <div className="max-w-2xl">
-          <p className="text-white/70 text-xs md:text-sm uppercase tracking-[0.22em] mb-4 animate-fade-up">
-            Welcome to NO LOGO JUST VIBE
-          </p>
+      <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+        <div
+          className="coin-wrap pointer-events-auto"
+          onMouseMove={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect()
+            const px = (e.clientX - rect.left) / rect.width - 0.5
+            const py = (e.clientY - rect.top) / rect.height - 0.5
+            setCoinTilt({ x: py * -16, y: px * 16 })
+          }}
+          onMouseLeave={() => setCoinTilt({ x: 0, y: 0 })}
+          style={{ '--coin-tilt-x': `${coinTilt.x}deg`, '--coin-tilt-y': `${coinTilt.y}deg` }}
+        >
+          <div className="coin">
+            <div className="coin-face coin-front">
+              <span>NO LOGO</span>
+            </div>
+            <div className="coin-face coin-back">
+              <span>NO LOGO JUST VIBES</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-          {/* Tag */}
-          <p className="tag animate-fade-up mb-5 flex items-center gap-2">
-            <span className="inline-block w-6 h-px bg-accent" />
-            New Season 2026
-          </p>
-
-          {/* Headline */}
-          <h1 className="font-black leading-[0.92] tracking-tight mb-6 animate-fade-up-delay">
-            <span
-              className="block text-white"
-              style={{ fontSize: 'clamp(3.5rem, 9vw, 7.5rem)' }}
-            >
-              RUN THE
-            </span>
-            <span
-              className="block text-[#e8e8e8]"
-              style={{ fontSize: 'clamp(3.5rem, 9vw, 7.5rem)' }}
-            >
-              STREETS.
-            </span>
-          </h1>
-
-          {/* Subheadline */}
-          <p className="text-white/60 text-lg md:text-xl font-light leading-relaxed max-w-md mb-10 animate-fade-up-delay2">
-            The finest kicks, handpicked for those who move with purpose.
-            Limited drops. Authentic pairs. Always fresh.
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-wrap gap-4 animate-fade-up-delay3">
-            <Link to="/products" className="btn-primary">
+      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-10 w-full max-w-7xl px-6">
+        <div className="max-w-2xl mx-auto">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 animate-fade-up-delay3 justify-center">
+            <Link to="/products" className="btn-primary w-full sm:w-auto justify-center px-7 py-3.5">
               Shop Now <ArrowRight size={16} />
             </Link>
-            <Link to="/products" className="btn-outline">
+            <Link to="/products" className="btn-outline w-full sm:w-auto justify-center px-7 py-3.5 border-white/50 bg-black/20 backdrop-blur-sm hover:bg-black/35">
               View Collection
             </Link>
-          </div>
-
-          {/* Trust badges */}
-          <div className="flex items-center gap-6 mt-12 animate-fade-up-delay3">
-            {[
-              { value: '500+', label: 'Styles' },
-              { value: '100%', label: 'Authentic' },
-              { value: 'Free', label: 'Returns' },
-            ].map((badge) => (
-              <div key={badge.label} className="flex flex-col">
-                <span className="text-white font-bold text-sm">{badge.value}</span>
-                <span className="text-white/40 text-xs font-medium">{badge.label}</span>
-              </div>
-            ))}
           </div>
         </div>
       </div>
